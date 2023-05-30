@@ -17,10 +17,15 @@ export class TypeScriptPlugin {
   options: Serverless.Options
   hooks: { [key: string]: Function }
   commands: Serverless.CommandsDefinition
+  /** Determines whether symlinks will be resolved when copying over files like
+   * node_modules when creating the to be deployed code. Typically required when
+   * using yarn workspaces. Defaults to true **/
+  resolveSymlinks: boolean
 
   constructor(serverless: Serverless.Instance, options: Serverless.Options) {
     this.serverless = serverless
     this.options = options
+    this.resolveSymlinks = serverless.service?.custom?.serverlessPluginTypescript?.resolveSymlinks ?? true
 
     this.commands = {
       invoke: {
@@ -210,7 +215,7 @@ export class TypeScriptPlugin {
         }
 
         if (!fs.existsSync(destFileName)) {
-          fs.copySync(path.resolve(filename), path.resolve(path.join(BUILD_FOLDER, filename)))
+          fs.copySync(path.resolve(filename), path.resolve(path.join(BUILD_FOLDER, filename)), { dereference: this.resolveSymlinks})
         }
       }
     }
@@ -233,7 +238,7 @@ export class TypeScriptPlugin {
 
       fs.copySync(
         path.resolve('node_modules'),
-        path.resolve(path.join(BUILD_FOLDER, 'node_modules'))
+        path.resolve(path.join(BUILD_FOLDER, 'node_modules')), {dereference: this.resolveSymlinks}
       )
     } else {
       if (!fs.existsSync(outModulesPath)) {

@@ -61,6 +61,23 @@ The default `tsconfig.json` file used by the plugin looks like this:
 
 All files from `package/include` will be included in the final build file. See [Exclude/Include](https://serverless.com/framework/docs/providers/aws/guide/packaging#exclude--include)
 
+### Symlinks (e.g. Yarn Workspace setup)
+
+By default (since version 2.2.0) this package follows symlinks in dependencies
+such as node_modules in order to correctly build the to be deployed code for
+setups like yarn workspaces. If you want to keep the previous behaviour of not
+following symlinks, there is a config flag you can set inside your
+serverless.yml.
+
+```yaml
+
+custom:
+  serverlessPluginTypescript:
+    resolveSymlinks: false
+
+```
+
+
 ### Non-standard tsconfig.json locations
 Override what tsconfig.json to use with the following snippet in your severless.yaml
 ```
